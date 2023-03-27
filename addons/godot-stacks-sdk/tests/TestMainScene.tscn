@@ -1,0 +1,105 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/godot-stacks-sdk/utils/WalletConnector.gd" type="Script" id=2]
+[ext_resource path="res://addons/godot-stacks-sdk/tests/MainSceneManager.gd" type="Script" id=3]
+
+[node name="TestMainScene" type="Node2D"]
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="WalletConnector" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="WalletLabel" type="Label" parent="UI"]
+margin_left = 64.0
+margin_top = 64.0
+margin_right = 201.0
+margin_bottom = 78.0
+text = "Wallet: SP1234567890abcdef"
+
+[node name="CheckUserNFTsButton" type="Button" parent="UI"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -96.0
+margin_top = -293.0
+margin_right = 96.0
+margin_bottom = -229.0
+rect_min_size = Vector2( 192, 64 )
+text = "Check user's NFTs"
+
+[node name="TokenAddress" type="LineEdit" parent="UI"]
+margin_left = 531.0
+margin_top = 14.0
+margin_right = 917.0
+margin_bottom = 38.0
+text = "SP2W12MNM4SPV37VZHN4GCDG35G9ACG3FDKK7WF04"
+
+[node name="TokenAddressLabel" type="Label" parent="UI"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -333.0
+margin_top = -346.0
+margin_right = -121.0
+margin_bottom = -322.0
+text = "Contract Address to check"
+align = 2
+valign = 1
+
+[node name="NftListLabel" type="Label" parent="UI"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -576.0
+margin_top = -200.0
+margin_right = -545.0
+margin_bottom = -176.0
+text = "NFT Collection:"
+
+[node name="ListBg" type="ColorRect" parent="UI"]
+margin_left = 48.0
+margin_top = 184.0
+margin_right = 1232.0
+margin_bottom = 702.0
+color = Color( 0.152941, 0.152941, 0.160784, 1 )
+
+[node name="NftErrorLabel" type="Label" parent="UI"]
+unique_name_in_owner = true
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -568.0
+margin_top = -504.0
+margin_right = -352.0
+margin_bottom = -480.0
+text = "Failed to get NFTs"
+autowrap = true
+
+[node name="NftList" type="ScrollContainer" parent="UI"]
+margin_left = 64.0
+margin_top = 200.0
+margin_right = 1216.0
+margin_bottom = 606.0
+scroll_vertical_enabled = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/NftList"]
+custom_constants/separation = 32
+
+[node name="LogoutButton" type="Button" parent="UI"]
+margin_left = 1112.0
+margin_top = 34.0
+margin_right = 1192.0
+margin_bottom = 74.0
+text = "Logout"
+
+[connection signal="pressed" from="UI/CheckUserNFTsButton" to="." method="_on_CheckUserNFTsButton_pressed"]
+[connection signal="pressed" from="UI/LogoutButton" to="." method="_on_LogoutButton_pressed"]
