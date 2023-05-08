@@ -25,8 +25,9 @@ func get_nft_holdings(principal: String, asset_identifiers: Array, \
 	
 	for asset_id in asset_identifiers:
 		url += "&asset_identifiers=" + asset_id
-	url += "&limit=" + str(limit)
-	if offset != 0:
+	if limit >= 0:
+		url += "&limit=" + str(limit)
+	if offset > 0:
 		url += "&offset=" + str(offset)
 	if unanchored:
 		url += "&unanchored=" + str(unanchored)
