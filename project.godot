@@ -16,8 +16,8 @@ config/icon="res://icon.png"
 
 [autoload]
 
-StacksGlobals="*res://addons/godot-stacks-sdk/StacksGlobals.gd"
 Stacks="*res://addons/godot-stacks-sdk/Stacks.gd"
+StacksGlobals="*res://addons/godot-stacks-sdk/StacksGlobals.gd"
 
 [display]
 
@@ -25,6 +25,10 @@ window/size/width=1280
 window/size/height=720
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/godot-stacks-sdk/plugin.cfg" )
 
 [gui]
 
