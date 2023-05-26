@@ -2,8 +2,6 @@ extends Node2D
 
 const NftInfoCard = preload("res://addons/godot-stacks-sdk/tests/NftInfo.tscn")
 
-onready var wallet_connector = $WalletConnector
-
 onready var wallet_label = $UI/WalletLabel
 onready var check_user_nfts_button = $UI/CheckUserNFTsButton
 onready var nft_list_container = $UI/NftList/HBoxContainer
