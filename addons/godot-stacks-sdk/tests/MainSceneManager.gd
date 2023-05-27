@@ -3,16 +3,23 @@ extends Node2D
 const NftInfoCard = preload("res://addons/godot-stacks-sdk/tests/NftInfo.tscn")
 
 onready var wallet_label = $UI/WalletLabel
+onready var btc_addresses_label = $UI/BtcAddressesLabel
 onready var check_user_nfts_button = $UI/CheckUserNFTsButton
-onready var nft_list_container = $UI/NftList/HBoxContainer
-onready var nft_list_label = $UI/NftListLabel
+onready var check_user_ordinals_button = $UI/CheckUserOrdinalsButton
+onready var nft_list_container = $"%NftListBoxContainer"
+onready var nft_list_label = $"%NftListLabel"
 onready var token_address_input = $UI/TokenAddress
-onready var nft_error_label = get_node("%NftErrorLabel")
+onready var nft_error_label = $"%NftErrorLabel"
+onready var tab_container = $UI/TabContainer
+onready var inscriptions_list_label = $"%InscriptionsLabel"
 
 func _ready():
 	nft_error_label.hide()
-	# Get and display the wallet address
+	# Get and display the wallet addresses
 	wallet_label.text = "Wallet: " + StacksGlobals.wallet
+	btc_addresses_label.text = "BTC Addresses: "
+	for address in StacksGlobals.btc_addresses:
+		btc_addresses_label.text += address + "\n"
 
 # Queries user NFT data
 func get_tokens() -> void:
@@ -84,7 +91,27 @@ func fetch_nft_metadata(nft_card, principal: String, nft_id: int):
 	nft_card.nft_metadata.text = str(nft_metadata)
 	nft_card.fetch_metadata_button.disabled = false
 
+func get_ordinals() -> void:
+	var json = Stacks.get_inscriptions({
+		"addresses": StacksGlobals.btc_addresses
+	})
+	
+	if json is GDScriptFunctionState:
+		json = yield(json, "completed")
+	
+	if json is Dictionary and json.has("error"):
+		inscriptions_list_label.text = str(json.error)
+	else:
+		var inscriptions_result = json.result
+		var inscriptions_formatted = JSON.print(inscriptions_result, "    ")
+		inscriptions_list_label.text = str(inscriptions_formatted)
+	
+	# Re-enable the button
+	check_user_ordinals_button.disabled = false
+	check_user_ordinals_button.text = "Check user's Ordinals"
+
 func _on_CheckUserNFTsButton_pressed():
+	tab_container.current_tab = 0
 	check_user_nfts_button.disabled = true
 	check_user_nfts_button.text = "Fetching user's NFTs..."
 	yield(get_tokens(), "completed")
@@ -95,3 +122,8 @@ func _on_LogoutButton_pressed():
 	Stacks.logout()
 	get_tree().change_scene("res://addons/godot-stacks-sdk/tests/TestLogin.tscn")
 
+func _on_CheckUserOrdinalsButton_pressed():
+	tab_container.current_tab = 1
+	check_user_ordinals_button.disabled = true
+	check_user_ordinals_button.text = "Fetching user's Ordinals..."
+	get_ordinals()

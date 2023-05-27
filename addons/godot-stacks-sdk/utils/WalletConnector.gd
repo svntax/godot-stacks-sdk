@@ -33,10 +33,12 @@ func _on_wallet_connected(res):
 		var parsed_json = JSON.parse(json_string)
 		if parsed_json.error == OK:
 			var addresses = parsed_json.result
-			# Search for the STX address
+			# Search for the STX and BTC addresses
 			for address_obj in addresses:
 				var symbol = address_obj.symbol
 				if symbol == "STX":
 					StacksGlobals.wallet = address_obj.address
+				elif symbol == "BTC":
+					StacksGlobals.btc_addresses.append(address_obj.address)
 	
 	emit_signal("wallet_connected", StacksGlobals.wallet)
