@@ -3,6 +3,8 @@ extends Node
 # For testnet, replace `mainnet` with `testnet`
 var api_endpoint = "https://api.mainnet.hiro.so"
 
+var ordinals_api_endpoint = "https://api.hiro.so"
+
 # https://hirosystems.github.io/stacks-blockchain-api/#tag/Accounts/operation/get_account_balance
 func get_account_balance(principal: String):
 	var url_format = api_endpoint + "/extended/v1/address/{principal}/balances"
@@ -58,9 +60,69 @@ func get_nft_metadata(principal: String, token_id: int):
 	
 	return api_result
 
+# Ordinals API
+
+# https://docs.hiro.so/ordinals#tag/Inscriptions/operation/getInscriptions
+func get_inscriptions(params: Dictionary):
+	var url = ordinals_api_endpoint + "/ordinals/v1/inscriptions"
+	if not params.empty():
+		url += "?"
+		var first_param = true
+		
+		if params.has("addresses"):
+			var addresses : Array = params.get("addresses", [])
+			if addresses.empty():
+				return create_error_response("No BTC addresses found.")
+			
+			for address in addresses:
+				if not first_param:
+					url += "&"
+				first_param = false
+				url += "address=" + str(address)
+		
+		if params.has("limit"):
+			var limit : int = params.get("limit", 20)
+			if not first_param:
+				url += "&"
+			first_param = false
+			url += "limit=" + str(limit)
+		
+		if params.has("offset"):
+			var offset : int = params.get("offset", 0)
+			if not first_param:
+				url += "&"
+			first_param = false
+			url += "offset=" + str(offset)
+	
+	var headers = ["Content-Type: application/json"]
+	var use_ssl = true
+	
+	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
+	
+	if api_result is GDScriptFunctionState:
+		api_result = yield(api_result, "completed")
+	
+	return api_result
+
+# https://docs.hiro.so/ordinals#tag/Inscriptions/operation/getInscription
+func get_inscription(inscription_id):
+	var url_format = ordinals_api_endpoint + "/ordinals/v1/inscriptions/{id}"
+	var url = url_format.format({"id": inscription_id})
+	
+	var headers = ["Content-Type: application/json"]
+	var use_ssl = true
+	
+	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
+	
+	if api_result is GDScriptFunctionState:
+		api_result = yield(api_result, "completed")
+	
+	return api_result
+
 # Clears the user's wallet and related data from the saved config file.
 func logout() -> void:
 	StacksGlobals.clear_wallet()
+	StacksGlobals.clear_bitcoin_addresses()
 	var save_path = StacksGlobals.USER_DATA_SAVE_PATH
 	var data_section = StacksGlobals.DATA_SECTION
 	

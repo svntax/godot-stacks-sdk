@@ -20,6 +20,8 @@ func _ready():
 	else:
 		var account = user_config.get_value(StacksGlobals.DATA_SECTION, "StacksAccount", "")
 		var wallet_type = user_config.get_value(StacksGlobals.DATA_SECTION, "StacksWalletType", -1)
+		var btc_addresses = user_config.get_value(StacksGlobals.DATA_SECTION, "BitcoinAddresses", [])
+		StacksGlobals.btc_addresses = btc_addresses
 		if account != null and account != "" and wallet_type != null and StacksGlobals.is_valid_wallet_type(wallet_type):
 			# Wallet account detected, skip the login screen
 			StacksGlobals.wallet = account
@@ -56,6 +58,7 @@ func save_user_login() -> void:
 		user_config = ConfigFile.new()
 	user_config.set_value(StacksGlobals.DATA_SECTION, "StacksAccount", StacksGlobals.wallet)
 	user_config.set_value(StacksGlobals.DATA_SECTION, "StacksWalletType", StacksGlobals.current_wallet_type)
+	user_config.set_value(StacksGlobals.DATA_SECTION, "BitcoinAddresses", StacksGlobals.btc_addresses)
 	user_config.save(StacksGlobals.USER_DATA_SAVE_PATH)
 
 func show_loading_ui() -> void:
