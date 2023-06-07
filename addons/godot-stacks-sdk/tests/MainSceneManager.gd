@@ -17,7 +17,7 @@ func _ready():
 	nft_error_label.hide()
 	# Get and display the wallet addresses
 	wallet_label.text = "Wallet: " + StacksGlobals.wallet
-	btc_addresses_label.text = "BTC Addresses: "
+	btc_addresses_label.text = "BTC Addresses:\n"
 	for address in StacksGlobals.btc_addresses:
 		btc_addresses_label.text += address + "\n"
 
