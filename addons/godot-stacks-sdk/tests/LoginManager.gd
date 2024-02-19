@@ -1,12 +1,12 @@
 extends Node
 
-onready var button_stacks_wallet = get_node("%ButtonStacksWallet")
+@onready var button_stacks_wallet = get_node("%ButtonStacksWallet")
 
-onready var wallet_connector = $WalletConnector
+@onready var wallet_connector = $WalletConnector
 
-onready var loading_rect = $LoadingRect
-onready var loading_label = $LoadingLabel
-onready var loading_cancel_button = $LoadingCancelButton
+@onready var loading_rect = $LoadingLayer/LoadingRect
+@onready var loading_label = $LoadingLayer/LoadingLabel
+@onready var loading_cancel_button = $LoadingLayer/LoadingCancelButton
 
 func _ready():
 	hide_loading_ui()
@@ -20,19 +20,17 @@ func _ready():
 	else:
 		var account = user_config.get_value(StacksGlobals.DATA_SECTION, "StacksAccount", "")
 		var wallet_type = user_config.get_value(StacksGlobals.DATA_SECTION, "StacksWalletType", -1)
-		var btc_addresses = user_config.get_value(StacksGlobals.DATA_SECTION, "BitcoinAddresses", [])
-		StacksGlobals.btc_addresses = btc_addresses
 		if account != null and account != "" and wallet_type != null and StacksGlobals.is_valid_wallet_type(wallet_type):
 			# Wallet account detected, skip the login screen
 			StacksGlobals.wallet = account
 			StacksGlobals.set_wallet_type(wallet_type)
-			get_tree().change_scene("res://addons/godot-stacks-sdk/tests/TestMainScene.tscn")
+			get_tree().change_scene_to_file("res://addons/godot-stacks-sdk/tests/TestMainScene.tscn")
 	
 	# Connect the buttons to their respective callbacks
-	button_stacks_wallet.connect("pressed", self, "Button_StacksWallet")
+	button_stacks_wallet.pressed.connect(Button_StacksWallet)
 	
 	# Connect the WalletConnector signal to handle wallet sign in
-	wallet_connector.connect("wallet_connected", self, "_on_wallet_connected")
+	wallet_connector.wallet_connected.connect(_on_wallet_connected)
 
 func Button_StacksWallet():
 	show_loading_ui()
@@ -40,7 +38,7 @@ func Button_StacksWallet():
 	StacksGlobals.set_wallet_type(StacksGlobals.WalletType.STACKS)
 
 func _on_wallet_connected(wallet: String):
-	if wallet == null or wallet.empty():
+	if wallet == null or wallet.is_empty():
 		print("Failed to connect wallet.")
 		StacksGlobals.clear_wallet()
 		hide_loading_ui()
@@ -49,7 +47,7 @@ func _on_wallet_connected(wallet: String):
 	# At this point, StacksGlobals.wallet should be set.
 	print("Connected with wallet: " + wallet)
 	save_user_login()
-	get_tree().change_scene("res://addons/godot-stacks-sdk/tests/TestMainScene.tscn")
+	get_tree().change_scene_to_file("res://addons/godot-stacks-sdk/tests/TestMainScene.tscn")
 
 func save_user_login() -> void:
 	var user_config = ConfigFile.new()
@@ -58,7 +56,6 @@ func save_user_login() -> void:
 		user_config = ConfigFile.new()
 	user_config.set_value(StacksGlobals.DATA_SECTION, "StacksAccount", StacksGlobals.wallet)
 	user_config.set_value(StacksGlobals.DATA_SECTION, "StacksWalletType", StacksGlobals.current_wallet_type)
-	user_config.set_value(StacksGlobals.DATA_SECTION, "BitcoinAddresses", StacksGlobals.btc_addresses)
 	user_config.save(StacksGlobals.USER_DATA_SAVE_PATH)
 
 func show_loading_ui() -> void:

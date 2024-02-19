@@ -10,12 +10,7 @@ func get_account_balance(principal: String):
 	var url_format = api_endpoint + "/extended/v1/address/{principal}/balances"
 	var url = url_format.format({"principal": principal})
 	var headers = ["Content-Type: application/json"]
-	var use_ssl = true
-	
-	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
-	
-	if api_result is GDScriptFunctionState:
-		api_result = yield(api_result, "completed")
+	var api_result = await query_api(url, headers, HTTPClient.METHOD_GET)
 	
 	return api_result
 
@@ -37,12 +32,7 @@ func get_nft_holdings(principal: String, asset_identifiers: Array, \
 		url += "&tx_metadata=" + str(tx_metadata)
 	
 	var headers = ["Content-Type: application/json"]
-	var use_ssl = true
-	
-	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
-	
-	if api_result is GDScriptFunctionState:
-		api_result = yield(api_result, "completed")
+	var api_result = await query_api(url, headers, HTTPClient.METHOD_GET)
 	
 	return api_result
 
@@ -51,27 +41,23 @@ func get_nft_metadata(principal: String, token_id: int):
 	var url_format = api_endpoint + "/metadata/v1/nft/{principal}/{token_id}"
 	var url = url_format.format({"principal": principal, "token_id": token_id})
 	var headers = ["Content-Type: application/json"]
-	var use_ssl = true
 	
-	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
-	
-	if api_result is GDScriptFunctionState:
-		api_result = yield(api_result, "completed")
+	var api_result = await query_api(url, headers, HTTPClient.METHOD_GET)
 	
 	return api_result
 
 # Ordinals API
 
-# https://docs.hiro.so/ordinals#tag/Inscriptions/operation/getInscriptions
+# https://docs.hiro.so/ordinals/list-of-inscriptions
 func get_inscriptions(params: Dictionary):
 	var url = ordinals_api_endpoint + "/ordinals/v1/inscriptions"
-	if not params.empty():
+	if not params.is_empty():
 		url += "?"
 		var first_param = true
 		
 		if params.has("addresses"):
 			var addresses : Array = params.get("addresses", [])
-			if addresses.empty():
+			if addresses.is_empty():
 				return create_error_response("No BTC addresses found.")
 			
 			for address in addresses:
@@ -95,34 +81,22 @@ func get_inscriptions(params: Dictionary):
 			url += "offset=" + str(offset)
 	
 	var headers = ["Content-Type: application/json"]
-	var use_ssl = true
-	
-	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
-	
-	if api_result is GDScriptFunctionState:
-		api_result = yield(api_result, "completed")
+	var api_result = await query_api(url, headers, HTTPClient.METHOD_GET)
 	
 	return api_result
 
-# https://docs.hiro.so/ordinals#tag/Inscriptions/operation/getInscription
+# https://docs.hiro.so/ordinals/specific-inscription
 func get_inscription(inscription_id):
 	var url_format = ordinals_api_endpoint + "/ordinals/v1/inscriptions/{id}"
 	var url = url_format.format({"id": inscription_id})
-	
 	var headers = ["Content-Type: application/json"]
-	var use_ssl = true
-	
-	var api_result = query_api(url, headers, use_ssl, HTTPClient.METHOD_GET)
-	
-	if api_result is GDScriptFunctionState:
-		api_result = yield(api_result, "completed")
+	var api_result = await query_api(url, headers, HTTPClient.METHOD_GET)
 	
 	return api_result
 
 # Clears the user's wallet and related data from the saved config file.
 func logout() -> void:
 	StacksGlobals.clear_wallet()
-	StacksGlobals.clear_bitcoin_addresses()
 	var save_path = StacksGlobals.USER_DATA_SAVE_PATH
 	var data_section = StacksGlobals.DATA_SECTION
 	
@@ -137,28 +111,26 @@ func logout() -> void:
 			user_config.erase_section(data_section)
 			user_config.save(save_path)
 
-func query_api(url: String, headers: Array, use_ssl: bool, method: int, query: String = "") -> Dictionary:
+func query_api(url: String, headers: Array, method: int, query: String = "") -> Dictionary:
 	var http = HTTPRequest.new()
 	add_child(http)
-	http.request(url, headers, use_ssl, method, query)
+	http.request(url, headers, method, query)
 	
 	# [result, status code, response headers, body]
-	var response = yield(http, "request_completed")
+	var response = await http.request_completed
 	if response[0] != OK:
 		var message = "An error occurred in the HTTP request."
 		push_error(message)
 		return create_error_response(message)
 	
 	var body = response[3]
-	var json = JSON.parse(body.get_string_from_utf8())
-	if json.error != OK:
-		var message = "Error when parsing JSON response."
-		push_error(message)
-		return create_error_response(message)
+	var json = JSON.new()
+	json.parse(body.get_string_from_utf8())
+	var json_data = json.get_data()
 	
 	http.queue_free()
 	
-	return json
+	return json_data
 
 # Format for error messages
 func create_error_response(message: String) -> Dictionary:

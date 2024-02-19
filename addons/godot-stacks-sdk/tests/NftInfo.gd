@@ -6,13 +6,13 @@ signal fetch_metadata(card, principal, nft_id)
 
 var nft_id : int = -1
 var principal : String = ""
-onready var nft_name = get_node("%Name")
-onready var nft_metadata = get_node("%Metadata")
-onready var nft_image = get_node("%NftImage")
-onready var fetch_metadata_button = get_node("%FetchMetadataButton")
+@onready var nft_name = %Name
+@onready var nft_metadata = %Metadata
+@onready var nft_image = %NftImage
+@onready var fetch_metadata_button = %FetchMetadataButton
 
 func _ready():
-	fetch_metadata_button.connect("pressed", self, "_fetch_metadata_pressed")
+	fetch_metadata_button.pressed.connect(_fetch_metadata_pressed)
 
 func set_nft_id(id: int):
 	nft_id = id

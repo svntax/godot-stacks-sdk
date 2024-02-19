@@ -14,6 +14,7 @@ func set_wallet_type(wallet_type: int) -> void:
 
 func clear_wallet() -> void:
 	wallet = ""
+	clear_bitcoin_addresses()
 	current_wallet_type = WalletType.NONE
 
 func clear_bitcoin_addresses() -> void:
