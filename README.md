@@ -1,13 +1,15 @@
 # godot-stacks-sdk
 A simple SDK to integrate Stacks into Godot.
 
+> This branch is for Godot 3.5.x
+
 ### Note: This project is still a work-in-progress.
 
 To-Do's:
 - Mobile is untested
 
 ## Features
-- User login/logout through Hiro wallet.
+- User login/logout through Leather wallet.
 - Fetch the user's NFT balance.
 
 ## API Calls
@@ -38,5 +40,4 @@ You can log out the user by calling `Stacks.logout()`, which deletes all data fr
 See `TestMainScene.tscn` for an example on how to use the Stacks API. Note that this scene also has its own node with `WalletConnector.gd` attached to it.
 
 ## Notes
-- Once Godot 4.0 is out, the SDK will need to be updated due to changes to coroutines and the replacement of `yield` with `await`. In the meantime, any calls to methods that wait for responses require checking if the return value is a GDScriptFunctionState, and if so, yield until completed.
-- Godot 4.0's web exporting for C# is not working, so upgrading the SDK to 4.x will have to wait until those issues are fixed.
+- Any calls to methods that wait for responses will require checking if the return value is a GDScriptFunctionState, and if so, yield until completed.
