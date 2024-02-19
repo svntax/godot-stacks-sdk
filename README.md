@@ -7,23 +7,14 @@ To-Do's:
 - Mobile is untested
 
 ## Features
-- User login/logout through Hiro wallet.
-- Fetch the user's NFT balance.
+- User login/logout through Leather wallet.
+- Fetch the user's NFT balance and Ordinals.
 
 ## API Calls
 API calls are implemented based on Hiro's hosted API. See `TestMainScene.tscn` for an example scene of how to use them. More can be added to the `Stacks.gd` script.
 
 ## Getting Started
-Download the C# Mono version of Godot 3.5.2. Then either clone this repository and import the project, or just copy the `addons/godot-stacks-sdk` directory into your own project's `addons` directory and enable the SDK from Godot's plugins menu.
-
-If you're copying the SDK over, make sure that your `.csproj` file has the following elements in `<PropertyGroup>`:
-```xml
-<PropertyGroup>
-  <TargetFramework>net472</TargetFramework>
-  <LangVersion>latest</LangVersion>
-  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-</PropertyGroup>
-```
+Download Godot 4.2.1, and then either clone this repository and import the project, or copy the `addons/godot-stacks-sdk` directory into your own project's `addons` directory and enable the SDK from Godot's plugins menu.
 
 ### Wallet Login/Logout
 See `TestLogin.tscn` for an example login scene.
@@ -38,5 +29,4 @@ You can log out the user by calling `Stacks.logout()`, which deletes all data fr
 See `TestMainScene.tscn` for an example on how to use the Stacks API. Note that this scene also has its own node with `WalletConnector.gd` attached to it.
 
 ## Notes
-- Once Godot 4.0 is out, the SDK will need to be updated due to changes to coroutines and the replacement of `yield` with `await`. In the meantime, any calls to methods that wait for responses require checking if the return value is a GDScriptFunctionState, and if so, yield until completed.
-- Godot 4.0's web exporting for C# is not working, so upgrading the SDK to 4.x will have to wait until those issues are fixed.
+- C# is currently not used because Godot 4.2.1 does not support C# for web builds, but for now, the SDK's current features still work.
